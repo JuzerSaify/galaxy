@@ -15,6 +15,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
     persistSession: false
   },
   realtime: {
+    transport: WebSocket,
     params: {
       eventsPerSecond: 2
     }
