@@ -25,6 +25,15 @@
   "build": {
     "appId": "com.knovant.research",
     "productName": "Knovant",
+    "protocols": [
+      {
+        "name": "Knovant Deep Link",
+        "schemes": [
+          "knovant",
+          "galaxy"
+        ]
+      }
+    ],
     "directories": {
       "output": "dist"
     },
