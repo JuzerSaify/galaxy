@@ -1,6 +1,8 @@
-// Polyfill global WebSocket for older Node environments inside Electron main process
+// Provide real WebSocket implementation for Node.js 20 (Electron 31)
+// Supabase realtime requires a W3C-compatible WebSocket
+const WebSocket = require('ws');
 if (typeof global.WebSocket === 'undefined') {
-  global.WebSocket = class {};
+  global.WebSocket = WebSocket;
 }
 
 const { createClient } = require('@supabase/supabase-js');
@@ -10,8 +12,19 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    persistSession: false // We will handle persistence manually via electron-store for maximum control
+    persistSession: false
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 2
+    }
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'galaxy-desktop/1.0.0'
+    }
   }
 });
 
 module.exports = supabase;
+

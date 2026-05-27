@@ -2,6 +2,7 @@
   "name": "galaxy-deep-research",
   "version": "1.0.0",
   "description": "An AI-powered deep research desktop application",
+  "author": "JuzerSaify <juzersaifuddinma@gmail.com>",
   "main": "src/main/main.js",
   "type": "commonjs",
   "scripts": {
@@ -14,7 +15,8 @@
     "@supabase/supabase-js": "^2.106.2",
     "cheerio": "^1.0.0-rc.12",
     "electron-store": "^8.2.0",
-    "electron-updater": "^6.8.3"
+    "electron-updater": "^6.8.3",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "electron": "^31.0.0",
@@ -29,7 +31,8 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "build/icon.png"
     },
     "publish": {
       "provider": "github",
