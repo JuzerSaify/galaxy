@@ -90,6 +90,10 @@ class ChatController {
         this.handleAuthStatusChange(status);
       });
     }
+
+    window.addEventListener('app:auth-changed', (e) => {
+      this.handleAuthStatusChange(e.detail);
+    });
   }
 
   setupListeners() {

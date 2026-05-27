@@ -172,6 +172,9 @@ class AuthController {
         const letter = (user.email || 'U').charAt(0).toUpperCase();
         this.profileAvatar.innerText = letter;
       }
+
+      // Dispatch global authentication change event
+      window.dispatchEvent(new CustomEvent('app:auth-changed', { detail: { isAuthenticated: true, user } }));
     }
   }
 
@@ -183,6 +186,9 @@ class AuthController {
       // Clear forms
       if (this.signinForm) this.signinForm.reset();
       if (this.signupForm) this.signupForm.reset();
+
+      // Dispatch global authentication change event
+      window.dispatchEvent(new CustomEvent('app:auth-changed', { detail: { isAuthenticated: false } }));
     }
   }
 }
