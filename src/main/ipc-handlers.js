@@ -214,7 +214,7 @@ function setupIpcHandlers() {
 
     const { filePath, canceled } = await dialog.showSaveDialog(parentWin, {
       title: 'Export Report as PDF',
-      defaultPath: defaultFilename || 'galaxy-report.pdf',
+      defaultPath: defaultFilename || 'knovant-report.pdf',
       filters: [{ name: 'PDF Documents', extensions: ['pdf'] }]
     });
 

@@ -5,7 +5,7 @@ const { app } = require('electron');
 
 // Pre-init config cleanup migration to prevent electron-store schema crashes
 try {
-  const userDataPath = app ? app.getPath('userData') : path.join(process.env.APPDATA || '', 'galaxy-deep-research');
+  const userDataPath = app ? app.getPath('userData') : path.join(process.env.APPDATA || '', 'knovant-deep-research');
   const configPath = path.join(userDataPath, 'config.json');
 
   if (fs.existsSync(configPath)) {
@@ -56,7 +56,7 @@ const schema = {
   },
   systemPrompt: {
     type: 'string',
-    default: `You are Galaxy, an elite AI deep research agent. You produce the highest quality intelligence reports in the industry.
+    default: `You are Knovant, an elite AI deep research agent. You produce the highest quality intelligence reports in the industry.
 
 CRITICAL RULES:
 1. ONLY use the provided real-time SOURCE data. You are strictly prohibited from using any pre-trained internal knowledge, facts, dates, prices, or version numbers that are not explicitly found in the provided sources.

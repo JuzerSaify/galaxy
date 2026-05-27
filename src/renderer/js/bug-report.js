@@ -60,7 +60,7 @@ class BugReportController {
         try {
           const res = await window.api.submitBugReport(title, description, email);
           if (res.success) {
-            alert('Bug report submitted successfully! Thank you for helping us improve Galaxy.');
+            alert('Bug report submitted successfully! Thank you for helping us improve Knovant.');
             this.close();
           } else {
             alert('Failed to submit report: ' + (res.error || 'Unknown error occurred'));

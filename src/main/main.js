@@ -17,10 +17,10 @@ process.on('unhandledRejection', (reason) => {
 // Register deep link protocol client
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('galaxy', process.execPath, [path.resolve(process.argv[1])]);
+    app.setAsDefaultProtocolClient('knovant', process.execPath, [path.resolve(process.argv[1])]);
   }
 } else {
-  app.setAsDefaultProtocolClient('galaxy');
+  app.setAsDefaultProtocolClient('knovant');
 }
 
 let mainWindow;
@@ -37,7 +37,7 @@ if (!gotTheLock) {
       mainWindow.focus();
     }
     // Parse deep link parameters from second instance command line arguments
-    const deepLinkUrl = commandLine.find(arg => arg.startsWith('galaxy://'));
+    const deepLinkUrl = commandLine.find(arg => arg.startsWith('knovant://'));
     if (deepLinkUrl) {
       handleDeepLink(deepLinkUrl);
     }
@@ -72,7 +72,7 @@ function createWindow() {
   });
 
   // Handle deep link on startup if the app was launched by clicking the protocol link
-  const startupUrl = process.argv.find(arg => arg.startsWith('galaxy://'));
+  const startupUrl = process.argv.find(arg => arg.startsWith('knovant://'));
   if (startupUrl) {
     setTimeout(() => {
       handleDeepLink(startupUrl);
@@ -81,11 +81,11 @@ function createWindow() {
 }
 
 async function handleDeepLink(urlString) {
-  if (!urlString || !urlString.startsWith('galaxy://')) return;
+  if (!urlString || !urlString.startsWith('knovant://')) return;
   try {
     console.log('[main] Deep link received:', urlString);
     // Replace custom protocol with https temporarily to use URL parser safely
-    const normalizedUrl = urlString.replace('galaxy://auth-callback', 'https://galaxy-auth');
+    const normalizedUrl = urlString.replace('knovant://auth-callback', 'https://knovant-auth');
     const parsedUrl = new URL(normalizedUrl);
     const hash = parsedUrl.hash;
     if (hash) {
@@ -138,7 +138,7 @@ function setupAutoUpdater() {
     dialog.showMessageBox(mainWindow, {
       type: 'question',
       title: 'App Update Available',
-      message: `A new version (${info.version}) of Galaxy Deep Research is ready to install. Restart now?`,
+      message: `A new version (${info.version}) of Knovant Deep Research is ready to install. Restart now?`,
       buttons: ['Restart & Install', 'Later'],
       defaultId: 0,
       cancelId: 1

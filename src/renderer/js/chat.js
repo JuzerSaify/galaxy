@@ -314,7 +314,7 @@ class ChatController {
     this.updateMetricsText(null);
 
     // 2. Prepare AI streaming message container
-    this.activeAiMessageContentEl = this.renderMessage('Galaxy', '', true);
+    this.activeAiMessageContentEl = this.renderMessage('Knovant', '', true);
 
     // 3. Initiate Deep Research loop
     try {
@@ -653,7 +653,7 @@ class ChatController {
     });
     actions.appendChild(copyBtn);
 
-    if (sender === 'Galaxy' && !isStreaming) {
+    if (sender === 'Knovant' && !isStreaming) {
       const regenBtn = document.createElement('button');
       regenBtn.className = 'message-action-btn regen-btn';
       regenBtn.title = 'Regenerate this response';
@@ -735,7 +735,7 @@ class ChatController {
       if (this.container) {
         this.container.innerHTML = '';
         state.chatHistory.forEach(msg => {
-          const sender = msg.role === 'user' ? 'User' : 'Galaxy';
+          const sender = msg.role === 'user' ? 'User' : 'Knovant';
           this.renderMessage(sender, msg.content, false);
         });
       }
@@ -770,13 +770,13 @@ class ChatController {
       }
     }
 
-    // Add regenerate button to actions of the newly completed Galaxy response
+    // Add regenerate button to actions of the newly completed Knovant response
     if (this.container) {
       const wrappers = this.container.querySelectorAll('.message-wrapper');
       if (wrappers.length > 0) {
         const lastWrapper = wrappers[wrappers.length - 1];
         const meta = lastWrapper.querySelector('.message-meta');
-        if (meta && meta.innerText.includes('Galaxy')) {
+        if (meta && meta.innerText.includes('Knovant')) {
           const actions = lastWrapper.querySelector('.message-actions');
           if (actions && !actions.querySelector('.regen-btn')) {
             const regenBtn = document.createElement('button');
@@ -970,7 +970,7 @@ class ChatController {
     promptEl.className = 'chat-login-prompt-wrapper';
     promptEl.innerHTML = `
       <div class="chat-login-prompt-content">
-        <h3 class="login-prompt-title">Sign in to Galaxy</h3>
+        <h3 class="login-prompt-title">Sign in to Knovant</h3>
         <p class="login-prompt-desc">
           To run deep research queries, estimate tokens, and synchronize your session, please authenticate first.
         </p>

@@ -8,7 +8,7 @@ import { auth } from './auth-controller.js';
 import { bugReport } from './bug-report.js';
 
 async function bootstrap() {
-  console.log('Galaxy initializing...');
+  console.log('Knovant initializing...');
 
   // 1. Load persistent settings from Electron Store
   await state.loadSettings();
@@ -97,7 +97,7 @@ async function bootstrap() {
     setTimeout(() => splash.remove(), 400);
   }
 
-  console.log('Galaxy successfully initialized.');
+  console.log('Knovant successfully initialized.');
 }
 
 window.addEventListener('DOMContentLoaded', bootstrap);

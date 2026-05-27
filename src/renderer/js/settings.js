@@ -406,7 +406,7 @@ class SettingsController {
     const resetPromptBtn = document.getElementById('prompt-reset-btn');
     if (resetPromptBtn) {
       resetPromptBtn.addEventListener('click', async () => {
-        const defaultPrompt = `You are Galaxy, an elite AI deep research agent. You produce the highest quality intelligence reports in the industry.
+        const defaultPrompt = `You are Knovant, an elite AI deep research agent. You produce the highest quality intelligence reports in the industry.
 
 CRITICAL RULES:
 1. ONLY use the provided real-time SOURCE data. You are strictly prohibited from using any pre-trained internal knowledge, facts, dates, prices, or version numbers that are not explicitly found in the provided sources.

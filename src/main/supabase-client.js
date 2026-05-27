@@ -22,7 +22,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   },
   global: {
     headers: {
-      'X-Client-Info': 'galaxy-desktop/1.0.0'
+      'X-Client-Info': 'knovant-desktop/1.0.0'
     }
   }
 });

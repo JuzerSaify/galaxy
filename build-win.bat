@@ -1,6 +1,6 @@
 @echo off
 echo ===================================================
-echo Building Galaxy Deep Research Installer for Windows
+echo Building Knovant Deep Research Installer for Windows
 echo ===================================================
 echo.
 npm run dist

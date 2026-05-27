@@ -799,7 +799,7 @@ class ReportController {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `galaxy-report-${Date.now()}.md`;
+      a.download = `knovant-report-${Date.now()}.md`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -844,7 +844,7 @@ class ReportController {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galaxy Deep Research Report</title>
+  <title>Knovant Deep Research Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -999,7 +999,7 @@ class ReportController {
 </body>
 </html>`;
 
-      const defaultFilename = `galaxy-report-${Date.now()}.pdf`;
+      const defaultFilename = `knovant-report-${Date.now()}.pdf`;
       const result = await window.api.exportPdf(fullHtml, defaultFilename);
       if (result.success) {
         console.log('[report] PDF exported successfully:', result.filePath);
@@ -1052,7 +1052,7 @@ class ReportController {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galaxy Deep Research Report</title>
+  <title>Knovant Deep Research Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -1155,7 +1155,7 @@ class ReportController {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `galaxy-report-${Date.now()}.html`;
+          a.download = `knovant-report-${Date.now()}.html`;
           a.click();
           URL.revokeObjectURL(url);
         } catch (e) {

@@ -1,5 +1,5 @@
 {
-  "name": "galaxy-deep-research",
+  "name": "knovant-deep-research",
   "version": "1.0.0",
   "description": "An AI-powered deep research desktop application",
   "author": "JuzerSaify <juzersaifuddinma@gmail.com>",
@@ -23,8 +23,8 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.galaxy.research",
-    "productName": "Galaxy",
+    "appId": "com.knovant.research",
+    "productName": "Knovant",
     "directories": {
       "output": "dist"
     },
@@ -37,7 +37,7 @@
     "publish": {
       "provider": "github",
       "owner": "JuzerSaify",
-      "repo": "galaxy"
+      "repo": "knovant"
     },
     "nsis": {
       "oneClick": false,
