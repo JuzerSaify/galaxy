@@ -81,13 +81,18 @@ function createWindow() {
 }
 
 async function handleDeepLink(urlString) {
-  if (!urlString || !urlString.startsWith('knovant://')) return;
+  if (!urlString || (!urlString.startsWith('knovant://') && !urlString.startsWith('galaxy://'))) return;
   try {
     console.log('[main] Deep link received:', urlString);
-    // Replace custom protocol with https temporarily to use URL parser safely
-    const normalizedUrl = urlString.replace('knovant://auth-callback', 'https://knovant-auth');
-    const parsedUrl = new URL(normalizedUrl);
-    const hash = parsedUrl.hash;
+    
+    // Extract access_token and refresh_token from hash or query parameters to be 100% robust
+    let hash = '';
+    if (urlString.includes('#')) {
+      hash = urlString.substring(urlString.indexOf('#'));
+    } else if (urlString.includes('?')) {
+      hash = '#' + urlString.substring(urlString.indexOf('?') + 1);
+    }
+    
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const accessToken = params.get('access_token');
