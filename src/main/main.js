@@ -183,5 +183,12 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+    setTimeout(() => {
+      process.exit(0);
+    }, 100);
   }
+});
+
+app.on('will-quit', () => {
+  process.exit(0);
 });
