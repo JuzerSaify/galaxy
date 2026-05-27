@@ -1,0 +1,47 @@
+.app-container {
+  display: grid;
+  grid-template-rows: var(--header-height) 1fr;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: var(--chat-width) 4px 1fr;
+  height: calc(100vh - var(--header-height));
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-panel {
+  background-color: var(--bg-side);
+  border-right: 1px solid var(--border-light);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  background-color: transparent;
+  transition: background-color var(--transition-normal);
+  position: relative;
+  z-index: 10;
+}
+
+.resize-handle:hover,
+.resize-handle.active {
+  background-color: var(--border-medium);
+}
+
+.report-panel {
+  background-color: var(--bg-main);
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}

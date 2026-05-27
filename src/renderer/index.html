@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://localhost:11434 http://127.0.0.1:11434 ws: wss: *; img-src 'self' data: https:; child-src 'none';">
+  <title>Galaxy — AI Deep Research</title>
+
+  <link rel="stylesheet" href="styles/preload-splash.css">
+  <link rel="stylesheet" href="styles/reset.css">
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/titlebar.css">
+  <link rel="stylesheet" href="styles/chat.css">
+  <link rel="stylesheet" href="styles/report.css">
+  <link rel="stylesheet" href="styles/settings.css">
+  <link rel="stylesheet" href="styles/command-palette.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- LOADING SPLASH SCREEN -->
+  <div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo">Galaxy</div>
+      <div class="splash-spinner"></div>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- CUSTOM TITLE BAR -->
+    <header class="titlebar" id="app-titlebar">
+      <div class="titlebar-left">
+        <span class="app-logo-text">Galaxy</span>
+        <span class="version-badge">v1</span>
+      </div>
+      <div class="titlebar-right">
+        <button class="titlebar-btn" id="bug-report-trigger-btn" title="Report a Bug">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 15px; height: 15px; display: block;"><rect width="8" height="14" x="8" y="6" rx="4"/><path d="m19 7-3 2"/><path d="m5 7 3 2"/><path d="m19 19-3-2"/><path d="m5 19 3-2"/><path d="M20 13h-4"/><path d="M4 13h4"/><path d="m10 4 1 2"/><path d="m14 4-1 2"/></svg>
+        </button>
+        <button class="titlebar-btn" id="settings-trigger-btn" title="Settings">
+          <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </button>
+        <button class="titlebar-btn" id="win-min-btn" title="Minimize">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button class="titlebar-btn" id="win-max-btn" title="Maximize">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+        </button>
+        <button class="titlebar-btn close-btn" id="win-close-btn" title="Close">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN APP SPLIT PANE -->
+    <main class="main-content">
+
+      <section class="chat-panel">
+        <header class="chat-header">
+          <span class="chat-header-title">Research Chat</span>
+          <div class="chat-header-actions">
+            <button class="chat-header-btn" id="chat-clear-btn" title="Clear Workspace (Ctrl+N)">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Clear
+            </button>
+            <button class="chat-header-btn" id="chat-history-btn" title="View Research History">
+              <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              History
+            </button>
+          </div>
+        </header>
+        <div class="chat-messages" id="chat-messages-container">
+
+          <!-- Research Phases Progress Bar -->
+          <div class="research-phases" id="research-phases-bar" style="display:none;">
+            <div class="phase-step">
+              <div class="phase-dot-row">
+                <div class="phase-dot" data-phase="decompose"></div>
+              </div>
+              <span class="phase-label" data-phase-label="decompose">Decompose</span>
+            </div>
+            <div class="phase-dot-row"><div class="phase-line" data-line="0"></div></div>
+            <div class="phase-step">
+              <div class="phase-dot-row">
+                <div class="phase-dot" data-phase="search"></div>
+              </div>
+              <span class="phase-label" data-phase-label="search">Search</span>
+            </div>
+            <div class="phase-dot-row"><div class="phase-line" data-line="1"></div></div>
+            <div class="phase-step">
+              <div class="phase-dot-row">
+                <div class="phase-dot" data-phase="scrape"></div>
+              </div>
+              <span class="phase-label" data-phase-label="scrape">Scrape</span>
+            </div>
+            <div class="phase-dot-row"><div class="phase-line" data-line="2"></div></div>
+            <div class="phase-step">
+              <div class="phase-dot-row">
+                <div class="phase-dot" data-phase="analyze"></div>
+              </div>
+              <span class="phase-label" data-phase-label="analyze">Analyze</span>
+            </div>
+            <div class="phase-dot-row"><div class="phase-line" data-line="3"></div></div>
+            <div class="phase-step">
+              <div class="phase-dot-row">
+                <div class="phase-dot" data-phase="synthesize"></div>
+              </div>
+              <span class="phase-label" data-phase-label="synthesize">Synthesize</span>
+            </div>
+          </div>
+
+          <!-- Sub-queries display -->
+          <div class="sub-queries-list" id="sub-queries-display" style="display:none;"></div>
+
+          <!-- Real-Time Scrape Progress Console -->
+          <div class="scrape-log" id="research-scrape-log" style="display:none;"></div>
+
+        </div>
+
+        <div class="chat-input-container">
+          <!-- Status indicator -->
+          <div class="status-indicator" id="research-status-bar">
+            <div class="status-spinner"></div>
+            <span id="research-status-text"></span>
+            <span id="research-metrics-text" style="font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); margin-left: auto; display: none;"></span>
+          </div>
+
+          <!-- Follow-up suggestions -->
+          <div class="followup-suggestions" id="followup-area" style="display:none;"></div>
+
+          <!-- Followup Q&A Mode Toggle -->
+          <div class="chat-input-toggles" id="chat-followup-toggle-container" style="opacity: 0.4; pointer-events: none;">
+            <label class="followup-toggle-label" title="Query strictly within active report content without searching the web">
+              <input type="checkbox" id="chat-followup-toggle" disabled>
+              <span class="followup-toggle-indicator"></span>
+              <span class="followup-toggle-text">Followup Mode</span>
+            </label>
+          </div>
+
+          <!-- Input row -->
+          <div class="chat-input-row">
+            <textarea class="chat-textarea" id="chat-input-field" placeholder="Ask anything or request a deep report..." rows="1"></textarea>
+            <button class="chat-action-btn" id="chat-submit-btn" title="Send">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+            <button class="chat-action-btn" id="chat-abort-btn" title="Cancel" style="display:none;">
+              <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESIZE HANDLE -->
+      <div class="resize-handle" id="resize-handle"></div>
+
+      <!-- RIGHT REPORT PREVIEW -->
+      <section class="report-panel">
+        <div class="report-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="report-header-title">Research Preview</span>
+            <select class="report-version-select" id="report-version-select" style="display:none;"></select>
+          </div>
+          <div class="report-actions">
+            <button class="report-btn" id="report-copy-btn" title="Copy markdown content">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+            <button class="report-btn" id="report-export-html-btn" title="Export as HTML">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              HTML
+            </button>
+            <button class="report-btn" id="report-export-pdf-btn" title="Export as PDF">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              PDF
+            </button>
+            <button class="report-btn" id="report-export-md-btn" title="Export as Markdown">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              MD
+            </button>
+            <button class="report-btn" id="report-clear-btn" title="Clear report">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="report-meta-bar" id="report-meta-bar" style="display:none;">
+          <span class="reading-time" id="report-reading-time"></span>
+          <span id="report-sources-count"></span>
+          <span id="report-confidence-summary"></span>
+        </div>
+
+        <div class="report-reading-progress-container" id="reading-progress-container" style="display:none;">
+          <div class="report-reading-progress-bar" id="reading-progress-bar"></div>
+        </div>
+
+        <div class="report-content-wrapper" id="report-scroll-container">
+          <div class="report-empty-state" id="report-empty-state-view">
+            <span class="report-empty-state-title">No report generated</span>
+            <span class="report-empty-state-subtitle">Research reports with executive summaries, cross-referenced data, and cited sources will appear here.</span>
+          </div>
+          <div class="report-content-with-toc" style="display:none;" id="report-with-toc">
+            <div class="report-content" id="report-render-target"></div>
+            <nav class="report-toc" id="report-toc"></nav>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FULL PAGE SETTINGS OVERLAY -->
+    <div class="settings-overlay" id="settings-view">
+
+      <aside class="settings-sidebar">
+        <nav class="settings-tabs-list">
+          <div class="settings-tab-btn active" data-tab="general">General</div>
+          <div class="settings-tab-btn" data-tab="model">Model</div>
+          <div class="settings-tab-btn" data-tab="research">Research</div>
+          <div class="settings-tab-btn" data-tab="prompt">System Prompt</div>
+          <div class="settings-tab-btn" data-tab="report">Report</div>
+          <div class="settings-tab-btn" data-tab="advanced">Advanced</div>
+          <div class="settings-tab-btn" data-tab="history">History</div>
+          <div class="settings-tab-btn" data-tab="profile">Profile</div>
+          <div class="settings-tab-btn" data-tab="about">About</div>
+        </nav>
+        <div class="settings-sidebar-footer">
+          <button class="settings-close-btn" id="settings-close-trigger">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Done
+          </button>
+        </div>
+      </aside>
+
+      <div class="settings-content-pane">
+
+        <!-- GENERAL TAB -->
+        <section class="settings-section active" data-section="general">
+          <h2>General Settings</h2>
+
+          <div class="settings-group">
+            <label class="settings-label">Startup Behavior</label>
+            <div class="toggle-row">
+              <span class="settings-description">Automatically focus input field on startup</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="set-auto-focus" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Appearance Theme</label>
+            <select class="settings-select" id="set-app-theme">
+              <option value="system">System Default</option>
+              <option value="black">Black (Dark)</option>
+              <option value="white">White (Light)</option>
+            </select>
+            <span class="settings-description">Toggle between Black, White, or System Default appearance themes</span>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Clear Data</label>
+            <div class="toggle-row">
+              <span class="settings-description">Delete conversation and active report states</span>
+              <button class="settings-btn-inline" id="set-clear-history-btn">Reset App Data</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- MODEL TAB -->
+        <section class="settings-section" data-section="model">
+          <h2>Model Configuration</h2>
+
+          <div class="settings-group">
+            <label class="settings-label">Ollama Host Address</label>
+            <input type="text" class="settings-input" id="set-ollama-host" placeholder="http://localhost:11434">
+            <span class="settings-description">The base url of your locally running Ollama server instance</span>
+            <div class="connection-status-row">
+              <span class="status-badge" id="model-connection-badge">Verifying...</span>
+              <button class="settings-btn-inline" id="model-ping-btn">Check connection</button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Selected Model</label>
+            <select class="settings-select" id="set-selected-model">
+              <option value="">No models available</option>
+            </select>
+            <span class="settings-description">Choose from your locally pulled Ollama models</span>
+          </div>
+
+
+          <div class="settings-group">
+            <label class="settings-label">Inference Temperature: <span id="val-temp">0.2</span></label>
+            <input type="range" class="settings-input" id="set-temperature" min="0" max="1" step="0.05" value="0.2">
+            <span class="settings-description">Lower values are highly focused and precise, ideal for objective deep research synthesis</span>
+          </div>
+        </section>
+
+        <!-- RESEARCH TAB -->
+        <section class="settings-section" data-section="research">
+          <h2>Research Capabilities</h2>
+
+          <div class="settings-group">
+            <label class="settings-label">Research Mode</label>
+            <select class="settings-select" id="set-research-mode">
+              <option value="quick">Quick (fastest, minimal depth)</option>
+              <option value="standard" selected>Standard (balanced coverage)</option>
+              <option value="deep">Deep (thorough multi-source analysis)</option>
+              <option value="exhaustive">Exhaustive (maximum coverage, slowest)</option>
+            </select>
+            <span class="settings-description">Controls the overall depth and thoroughness of the research pipeline</span>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Multi-Query Decomposition</label>
+            <div class="toggle-row">
+              <span class="settings-description">Automatically decompose complex questions into targeted sub-queries</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="set-enable-multi-query" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Max Sub-Queries: <span id="val-max-sub-queries">3</span></label>
+            <input type="range" class="settings-input" id="set-max-sub-queries" min="1" max="5" step="1" value="3">
+            <span class="settings-description">Maximum number of decomposed sub-queries per research session</span>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Search Query Depth</label>
+            <select class="settings-select" id="set-search-depth">
+              <option value="1">1 page (Quick scan)</option>
+              <option value="3" selected>3 pages (Standard research)</option>
+              <option value="5">5 pages (Deeper analysis)</option>
+              <option value="8">8 pages (Comprehensive investigation)</option>
+            </select>
+            <span class="settings-description">Number of primary search results to query and analyze</span>
+          </div>
+
+
+          <div class="settings-group">
+            <label class="settings-label">Follow-Up Suggestions</label>
+            <div class="toggle-row">
+              <span class="settings-description">Generate follow-up questions after each research session</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="set-enable-followups" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Source Scoring</label>
+            <div class="toggle-row">
+              <span class="settings-description">Score and rank sources by reliability and relevance</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="set-enable-source-scoring" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- SYSTEM PROMPT TAB -->
+        <section class="settings-section" data-section="prompt">
+          <h2>System Instructions</h2>
+
+          <div class="settings-group">
+            <label class="settings-label">Expert Persona Prompt</label>
+            <textarea class="settings-textarea" id="set-system-prompt" placeholder="Enter system instructions..."></textarea>
+            <span class="settings-description">Configures the default behavior, voice, and analysis strategy of the research agent.</span>
+            <div>
+              <button class="settings-btn-inline" id="prompt-reset-btn">Reset to default</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- REPORT TAB -->
+        <section class="settings-section" data-section="report">
+          <h2>Report Formats</h2>
+
+          <div class="settings-group">
+            <label class="settings-label">Auto-Generate Preview</label>
+            <div class="toggle-row">
+              <span class="settings-description">Automatically generate structured reports in real-time</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="set-auto-report" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Report Body Font Size: <span id="val-font-size">15px</span></label>
+            <input type="range" class="settings-input" id="set-font-size" min="12" max="20" step="1" value="15">
+            <span class="settings-description">Adjust reading comfort size for research summaries</span>
+          </div>
+        </section>
+
+        <!-- ADVANCED TAB -->
+        <section class="settings-section" data-section="advanced">
+          <h2>Advanced Parameters</h2>
+
+          <div class="settings-group">
+            <label class="settings-label">Ollama Model Keep-Alive Duration</label>
+            <input type="text" class="settings-input" id="set-keep-alive" placeholder="5m">
+            <span class="settings-description">Duration the model stays loaded in GPU/CPU memory (e.g. 5m, 1h, 0)</span>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Context Length: <span id="val-context">16384</span> tokens</label>
+            <input type="range" class="settings-input" id="set-context-length" min="2048" max="131072" step="2048" value="16384">
+            <span class="settings-description">Maximum context window size for the model. Larger values allow longer search history and more source content but require more memory.</span>
+          </div>
+
+        </section>
+
+        <!-- HISTORY TAB -->
+        <section class="settings-section" data-section="history">
+          <h2>Research History</h2>
+
+          <div class="settings-group">
+            <div id="history-list-container" class="history-list">
+              <span class="history-empty">No research history recorded yet.</span>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <div class="toggle-row">
+              <span class="settings-description">Permanently remove all saved research sessions</span>
+              <button class="settings-btn-inline" id="clear-research-history-btn">Clear All History</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFILE TAB -->
+        <section class="settings-section" data-section="profile">
+          <h2>User Account</h2>
+
+          <div id="auth-loading-state" class="settings-group" style="display: none;">
+            <div class="settings-loading-row" style="display: flex; align-items: center; gap: 8px; font-size: var(--font-size-sm); color: var(--text-secondary);">
+              <span class="auth-spinner" style="border: 2px solid var(--border-medium); border-top-color: var(--accent-primary); border-radius: 50%; width: 14px; height: 14px; display: inline-block; animation: spin 1s linear infinite;"></span>
+              Verifying credentials...
+            </div>
+          </div>
+
+          <!-- Logged Out Auth Forms -->
+          <div id="auth-logged-out-view" class="settings-group">
+            <span class="settings-description" style="margin-bottom: 20px; display: block;">
+              Sign in with your Galaxy Account to track model usage and token counts, submit authenticated bug reports, and sync settings.
+            </span>
+
+            <div class="auth-toggle-buttons" style="display: flex; gap: 4px; background-color: var(--bg-input); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+              <button type="button" class="auth-toggle-btn active" id="toggle-signin-mode" style="flex: 1; border: none; background: transparent; padding: 6px 12px; font-size: var(--font-size-sm); font-weight: 500; color: var(--text-primary); cursor: pointer; border-radius: 3px;">Sign In</button>
+              <button type="button" class="auth-toggle-btn" id="toggle-signup-mode" style="flex: 1; border: none; background: transparent; padding: 6px 12px; font-size: var(--font-size-sm); font-weight: 500; color: var(--text-secondary); cursor: pointer; border-radius: 3px;">Sign Up</button>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="auth-signin-form" class="auth-form active" style="display: flex; flex-direction: column; gap: 12px;">
+              <div class="settings-group" style="margin-bottom: 0;">
+                <label class="settings-label">Email Address</label>
+                <input type="email" class="settings-input" id="signin-email" placeholder="you@example.com" required>
+              </div>
+              <div class="settings-group" style="margin-bottom: 0;">
+                <label class="settings-label">Password</label>
+                <input type="password" class="settings-input" id="signin-password" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="settings-btn-inline" style="justify-content: center; height: 36px; margin-top: 8px; width: 100%;">Sign In</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="auth-signup-form" class="auth-form" style="display: none; flex-direction: column; gap: 12px;">
+              <div class="settings-group" style="margin-bottom: 0;">
+                <label class="settings-label">Email Address</label>
+                <input type="email" class="settings-input" id="signup-email" placeholder="you@example.com" required>
+              </div>
+              <div class="settings-group" style="margin-bottom: 0;">
+                <label class="settings-label">Password</label>
+                <input type="password" class="settings-input" id="signup-password" placeholder="Minimum 6 characters" required>
+              </div>
+              <button type="submit" class="settings-btn-inline" style="justify-content: center; height: 36px; margin-top: 8px; width: 100%;">Create Account</button>
+            </form>
+
+            <div class="auth-divider" style="display: flex; align-items: center; text-align: center; color: var(--text-tertiary); font-size: var(--font-size-xs); margin: 16px 0;">
+              <div style="flex: 1; height: 1px; background-color: var(--border-light);"></div>
+              <span style="padding: 0 10px;">or</span>
+              <div style="flex: 1; height: 1px; background-color: var(--border-light);"></div>
+            </div>
+
+            <!-- Google Login Button -->
+            <button type="button" class="google-auth-btn" id="google-signin-btn" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 38px; background-color: #FFFFFF; border: 1px solid var(--border-medium); border-radius: var(--radius-sm); color: #3c4043; font-weight: 500; font-family: var(--font-sans); font-size: 13.5px; cursor: pointer; transition: background-color var(--transition-fast);">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 1 12 1 7.35 1 3.37 3.65 1.39 7.56l3.85 3C6.17 7.59 8.87 5.04 12 5.04z"/><path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.34H12v4.47h6.44c-.28 1.47-1.11 2.71-2.36 3.55l3.66 2.84c2.14-1.97 3.39-4.88 3.39-8.52z"/><path fill="#FBBC05" d="M5.24 14.56c-.24-.72-.38-1.5-.38-2.31s.14-1.59.38-2.31L1.39 6.94C.5 8.73 0 10.73 0 12.8s.5 4.07 1.39 5.86l3.85-3.1z"/><path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.1.74-2.52 1.18-4.3 1.18-3.13 0-5.83-2.55-6.76-5.52l-3.85 3C3.37 20.35 7.35 23 12 23z"/></svg>
+              Continue with Google
+            </button>
+          </div>
+
+          <!-- Logged In Profile View -->
+          <div id="auth-logged-in-view" class="settings-group" style="display: none;">
+            <div class="profile-card" style="display: flex; align-items: center; gap: 12px; background-color: var(--bg-input); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px; border: 1px solid var(--border-light);">
+              <div class="profile-avatar" id="user-profile-avatar" style="width: 36px; height: 36px; background-color: var(--accent-primary); color: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px;">U</div>
+              <div class="profile-details" style="display: flex; flex-direction: column; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span class="profile-email" id="user-profile-email" style="font-size: var(--font-size-base); font-weight: 500; color: var(--text-primary);">email@example.com</span>
+                <span class="profile-id" id="user-profile-id" style="font-size: var(--font-size-xs); color: var(--text-tertiary); font-family: var(--font-mono);">ID: loading...</span>
+              </div>
+            </div>
+
+            <div class="settings-group" style="border-top: 1px solid var(--border-light); padding-top: 16px;">
+              <label class="settings-label">Database Sync Active</label>
+              <span class="settings-description" style="color: var(--confidence-high); font-weight: 500;">
+                Connected to Supabase. Model research queries, token estimates, and bug reports are securely synchronized to your profile database.
+              </span>
+            </div>
+
+            <button type="button" class="settings-btn-inline" id="auth-signout-btn" style="border-color: #c92a2a; color: #c92a2a; justify-content: center; width: 100%; height: 36px; margin-top: 12px;">Sign Out</button>
+          </div>
+        </section>
+
+        <!-- ABOUT TAB -->
+        <section class="settings-section" data-section="about">
+          <h2>About Galaxy</h2>
+
+          <div class="settings-group">
+            <span class="settings-description" style="font-size: 14px; color: var(--text-primary);">
+              Galaxy is an advanced local-first desktop intelligence system designed for deep web research and instant high-fidelity report drafting.
+            </span>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Specifications</label>
+            <span class="settings-description" style="font-family: var(--font-mono); font-size: 12px; line-height: 1.8;">
+              Application Version: 1.0.0<br>
+              Host Machine OS: Windows Desktop<br>
+              Engine Integration: Ollama REST API<br>
+              Web Parser: Cheerio Node Engine<br>
+              Research Pipeline: Multi-Phase Decomposition
+            </span>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BUG REPORT OVERLAY -->
+  <div class="settings-overlay" id="bug-report-view" style="display: none; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(3, 7, 18, 0.8); z-index: 2000; padding: 20px; backdrop-filter: blur(8px);">
+    <div class="bug-report-modal" style="background-color: var(--bg-side); border: 1px solid var(--border-medium); border-radius: 6px; width: 100%; max-width: 460px; padding: 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);">
+      <div class="bug-report-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 12px;">
+        <h3 style="font-size: var(--font-size-lg); font-weight: 600; color: var(--text-primary);">Report a Bug</h3>
+        <button type="button" class="bug-report-close-btn" id="bug-report-close-trigger" style="background: transparent; border: none; font-size: 20px; color: var(--text-secondary); cursor: pointer; line-height: 1; padding: 0 4px;">&times;</button>
+      </div>
+      <form id="bug-report-form" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="settings-group" style="margin-bottom: 0;">
+          <label class="settings-label">Bug Title</label>
+          <input type="text" class="settings-input" id="bug-title" placeholder="Briefly describe the issue..." required>
+        </div>
+        <div class="settings-group" style="margin-bottom: 0;">
+          <label class="settings-label">Description & Steps to Reproduce</label>
+          <textarea class="settings-textarea" id="bug-desc" placeholder="What happened? What were the steps to trigger the bug?..." style="height: 100px; resize: none;" required></textarea>
+        </div>
+        <div class="settings-group" style="margin-bottom: 0;">
+          <label class="settings-label">Contact Email (Optional)</label>
+          <input type="email" class="settings-input" id="bug-email" placeholder="you@example.com">
+        </div>
+        <div class="bug-report-actions" style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border-light); padding-top: 14px; margin-top: 4px;">
+          <button type="button" class="settings-btn-inline" id="bug-report-cancel-btn" style="height: 36px; padding: 0 16px; border: 1px solid var(--border-medium); background: transparent; color: var(--text-secondary); cursor: pointer;">Cancel</button>
+          <button type="submit" class="settings-btn-inline" style="height: 36px; padding: 0 16px; background-color: var(--accent-primary); color: #FFF; border: none; font-weight: 500; cursor: pointer;">Submit Bug</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- COMMAND PALETTE OVERLAY -->
+  <div class="command-palette-overlay" id="command-palette">
+    <div class="command-palette-modal">
+      <div class="command-palette-search-container">
+        <svg class="command-palette-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="command-palette-input" id="command-palette-input" placeholder="Type a command or search..." autocomplete="off">
+        <span class="command-palette-esc-badge">ESC</span>
+      </div>
+      <div class="command-palette-results" id="command-palette-results">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script src="lib/marked.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
