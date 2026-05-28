@@ -37,7 +37,7 @@ if (!gotTheLock) {
       mainWindow.focus();
     }
     // Parse deep link parameters from second instance command line arguments
-    const deepLinkUrl = commandLine.find(arg => arg.startsWith('knovant://'));
+    const deepLinkUrl = commandLine.find(arg => arg.includes('knovant://') || arg.includes('galaxy://'));
     if (deepLinkUrl) {
       handleDeepLink(deepLinkUrl);
     }
@@ -72,7 +72,7 @@ function createWindow() {
   });
 
   // Handle deep link on startup if the app was launched by clicking the protocol link
-  const startupUrl = process.argv.find(arg => arg.startsWith('knovant://'));
+  const startupUrl = process.argv.find(arg => arg.includes('knovant://') || arg.includes('galaxy://'));
   if (startupUrl) {
     setTimeout(() => {
       handleDeepLink(startupUrl);
