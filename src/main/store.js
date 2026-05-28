@@ -144,4 +144,67 @@ Your response MUST contain exactly two sections separated by markers:
 
 const store = new Store({ schema, clearInvalidConfig: true });
 
+// Encrypted session helpers using Electron safeStorage
+store.setSession = function(session) {
+  if (!session) {
+    store.set('supabaseSession', null);
+    return;
+  }
+  const { safeStorage } = require('electron');
+  const sessionStr = JSON.stringify(session);
+  if (safeStorage && safeStorage.isEncryptionAvailable()) {
+    try {
+      const encryptedBuffer = safeStorage.encryptString(sessionStr);
+      store.set('supabaseSession', {
+        encrypted: true,
+        data: encryptedBuffer.toString('base64')
+      });
+      return;
+    } catch (e) {
+      console.error('[store] Encryption failed, falling back to plaintext:', e.message);
+    }
+  }
+  store.set('supabaseSession', {
+    encrypted: false,
+    data: sessionStr
+  });
+};
+
+store.getSession = function() {
+  const sessionVal = store.get('supabaseSession');
+  if (!sessionVal) return null;
+  
+  // If it's the old schema format (direct session object)
+  if (sessionVal.access_token && sessionVal.refresh_token) {
+    // Migrated/fallback path: encrypt it right away and return
+    store.setSession(sessionVal);
+    return sessionVal;
+  }
+
+  if (sessionVal.encrypted && sessionVal.data) {
+    const { safeStorage } = require('electron');
+    if (safeStorage && safeStorage.isEncryptionAvailable()) {
+      try {
+        const encryptedBuffer = Buffer.from(sessionVal.data, 'base64');
+        const decryptedStr = safeStorage.decryptString(encryptedBuffer);
+        return JSON.parse(decryptedStr);
+      } catch (e) {
+        console.error('[store] Decryption failed, resetting session:', e.message);
+        store.set('supabaseSession', null);
+        return null;
+      }
+    } else {
+      console.warn('[store] Encryption unavailable on this machine, could not decrypt session');
+      return null;
+    }
+  } else if (sessionVal.data) {
+    try {
+      return JSON.parse(sessionVal.data);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+};
+
 module.exports = store;

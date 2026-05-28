@@ -15,6 +15,9 @@ class AuthController {
     this.profileEmail = null;
     this.profileId = null;
     this.profileAvatar = null;
+
+    this.failedAttempts = 0;
+    this.lockoutUntil = null;
   }
 
   async init() {
@@ -92,17 +95,40 @@ class AuthController {
     if (this.signinForm) {
       this.signinForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Rate limit lockout check
+        if (this.lockoutUntil && Date.now() < this.lockoutUntil) {
+          const remaining = Math.ceil((this.lockoutUntil - Date.now()) / 1000);
+          alert(`Too many failed attempts. Please try again in ${remaining} seconds.`);
+          return;
+        }
+
         const email = document.getElementById('signin-email').value.trim();
         const password = document.getElementById('signin-password').value;
+
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('Invalid email format. Please enter a valid email address.');
+          return;
+        }
 
         this.showLoading(true);
         const res = await window.api.signIn(email, password);
         this.showLoading(false);
 
         if (res.success && res.user) {
+          this.failedAttempts = 0;
+          this.lockoutUntil = null;
           this.showLoggedIn(res.user);
         } else {
-          alert('Sign In Failed: ' + (res.error || 'Check your credentials'));
+          this.failedAttempts++;
+          if (this.failedAttempts >= 5) {
+            this.lockoutUntil = Date.now() + 60000; // 60s lockout
+            alert('Too many failed attempts. You have been locked out for 60 seconds.');
+          } else {
+            alert('Sign In Failed: Invalid email or password.');
+          }
         }
       });
     }
@@ -114,6 +140,21 @@ class AuthController {
         const email = document.getElementById('signup-email').value.trim();
         const password = document.getElementById('signup-password').value;
 
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('Invalid email format. Please enter a valid email address.');
+          return;
+        }
+
+        // Password strength check
+        // Minimum 8 characters, at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+          alert('Password too weak. It must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+          return;
+        }
+
         this.showLoading(true);
         const res = await window.api.signUp(email, password);
         this.showLoading(false);
@@ -122,7 +163,7 @@ class AuthController {
           alert('Account created! Please check your email for confirmation or sign in.');
           if (this.toggleSignin) this.toggleSignin.click();
         } else {
-          alert('Sign Up Failed: ' + (res.error || 'Password must be at least 6 characters'));
+          alert('Sign Up Failed: ' + (res.error || 'Check signup details.'));
         }
       });
     }
@@ -130,10 +171,22 @@ class AuthController {
     // Google login
     if (this.googleBtn) {
       this.googleBtn.addEventListener('click', async () => {
-        this.showLoading(true);
+        this.showLoading(true, 'Waiting for browser authentication...');
+        
+        // Start a 5-minute OAuth timeout timer
+        if (this.oauthTimeout) clearTimeout(this.oauthTimeout);
+        this.oauthTimeout = setTimeout(() => {
+          this.showLoading(false);
+          alert('Google Sign-In timed out. Please try again.');
+        }, 5 * 60 * 1000);
+
         const res = await window.api.signInWithGoogle();
-        this.showLoading(false);
         if (!res.success) {
+          this.showLoading(false);
+          if (this.oauthTimeout) {
+            clearTimeout(this.oauthTimeout);
+            this.oauthTimeout = null;
+          }
           alert('Failed to launch Google Sign In: ' + res.error);
         }
       });
@@ -155,13 +208,24 @@ class AuthController {
     }
   }
 
-  showLoading(isLoading) {
+  showLoading(isLoading, text = 'Verifying credentials...') {
     if (this.loadingState) {
+      const textContainer = this.loadingState.querySelector('.settings-loading-row');
+      if (textContainer) {
+        textContainer.innerHTML = `
+          <span class="auth-spinner" style="border: 2px solid var(--border-medium); border-top-color: var(--accent-primary); border-radius: 50%; width: 14px; height: 14px; display: inline-block; animation: spin 1s linear infinite;"></span>
+          ${text}
+        `;
+      }
       this.loadingState.style.display = isLoading ? 'block' : 'none';
     }
   }
 
   showLoggedIn(user) {
+    if (this.oauthTimeout) {
+      clearTimeout(this.oauthTimeout);
+      this.oauthTimeout = null;
+    }
     if (this.loggedOutView && this.loggedInView) {
       this.loggedOutView.style.display = 'none';
       this.loggedInView.style.display = 'block';
@@ -179,6 +243,10 @@ class AuthController {
   }
 
   showLoggedOut() {
+    if (this.oauthTimeout) {
+      clearTimeout(this.oauthTimeout);
+      this.oauthTimeout = null;
+    }
     if (this.loggedOutView && this.loggedInView) {
       this.loggedOutView.style.display = 'block';
       this.loggedInView.style.display = 'none';

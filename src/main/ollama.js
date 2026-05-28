@@ -19,7 +19,11 @@ class OllamaClient {
   }
 
   get baseUrl() {
-    return store.get('ollamaHost').replace(/\/$/, '');
+    const host = store.get('ollamaHost').replace(/\/$/, '');
+    if (host.startsWith('http://') && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+      console.warn('[SECURITY WARNING] Connecting to remote Ollama host over unencrypted HTTP. All transmitted model inputs (including user queries and scraped content) will be sent in cleartext!');
+    }
+    return host;
   }
 
   async listModels() {

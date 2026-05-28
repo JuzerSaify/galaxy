@@ -57,7 +57,7 @@ function createWindow() {
       preload: path.join(__dirname, '../preload/preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
 
@@ -116,8 +116,8 @@ async function handleDeepLink(urlString) {
 
         if (error) throw error;
 
-        // Persist session to store
-        store.set('supabaseSession', data.session);
+        // Persist session to store securely
+        store.setSession(data.session);
         console.log('[main] Supabase session set successfully via deep link for:', data.user.email);
 
         // Notify UI
@@ -198,12 +198,5 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
-    setTimeout(() => {
-      process.exit(0);
-    }, 100);
   }
-});
-
-app.on('will-quit', () => {
-  process.exit(0);
 });

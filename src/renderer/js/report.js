@@ -95,7 +95,7 @@ class ReportController {
     try {
       // Parse markdown to HTML using Marked library loaded in HTML header
       const html = window.marked.parse(markdown);
-      this.target.innerHTML = html;
+      this.target.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(html) : html;
 
       // Handle all links in report to open in external browser securely
       const links = this.target.querySelectorAll('a');
@@ -816,7 +816,7 @@ class ReportController {
     try {
       const parsedHtml = window.marked.parse(state.currentReportBuffer);
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = parsedHtml;
+      tempDiv.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(parsedHtml) : parsedHtml;
 
       // Post-process HTML for custom SVG chart blocks
       const codeBlocks = tempDiv.querySelectorAll('pre code');

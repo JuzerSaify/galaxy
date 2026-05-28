@@ -348,7 +348,7 @@ class ChatController {
         }
 
         if (window.marked && typeof window.marked.parse === 'function') {
-          this.activeAiMessageContentEl.innerHTML = window.marked.parse(cleanChat);
+          this.activeAiMessageContentEl.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(window.marked.parse(cleanChat)) : window.marked.parse(cleanChat);
         } else {
           this.activeAiMessageContentEl.innerText = cleanChat;
         }
@@ -542,7 +542,7 @@ class ChatController {
       bodyHtml += `
         <div class="scrape-log-item">
           <div class="scrape-status-dot ${statusClass}"></div>
-          <span class="scrape-item-domain">${domain}</span>
+          <span class="scrape-item-domain">${window.DOMPurify ? window.DOMPurify.sanitize(domain) : domain.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
           <span class="scrape-item-details">${isSuccess ? `${sizeKb} ${trustScore}` : 'Failed'}</span>
         </div>
       `;
@@ -628,7 +628,7 @@ class ChatController {
       content.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
     } else {
       if (window.marked && typeof window.marked.parse === 'function') {
-        content.innerHTML = window.marked.parse(text);
+        content.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(window.marked.parse(text)) : window.marked.parse(text);
       } else {
         content.innerText = text;
       }
@@ -763,7 +763,7 @@ class ChatController {
       const parsed = this.parseSplitStream(this.fullBuffer);
       if (parsed.chat) {
         if (window.marked && typeof window.marked.parse === 'function') {
-          this.activeAiMessageContentEl.innerHTML = window.marked.parse(parsed.chat);
+          this.activeAiMessageContentEl.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(window.marked.parse(parsed.chat)) : window.marked.parse(parsed.chat);
         } else {
           this.activeAiMessageContentEl.innerText = parsed.chat;
         }

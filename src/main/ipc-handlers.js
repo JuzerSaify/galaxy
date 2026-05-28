@@ -4,9 +4,9 @@ const scraper = require('./scraper');
 const ollama = require('./ollama');
 const supabase = require('./supabase-client');
 
-// Restore Supabase session from electron-store on startup
+// Restore Supabase session securely from electron-store on startup
 try {
-  const savedSession = store.get('supabaseSession');
+  const savedSession = store.getSession();
   if (savedSession) {
     supabase.auth.setSession({
       access_token: savedSession.access_token,
@@ -14,10 +14,10 @@ try {
     }).then(({ data, error }) => {
       if (error) {
         console.warn('[supabase] Session restoration failed:', error.message);
-        store.set('supabaseSession', null);
+        store.setSession(null);
       } else {
         console.log('[supabase] Session successfully restored for:', data.user.email);
-        store.set('supabaseSession', data.session);
+        store.setSession(data.session);
       }
     });
   }
@@ -42,7 +42,7 @@ function setupIpcHandlers() {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      store.set('supabaseSession', data.session);
+      store.setSession(data.session);
       return { success: true, user: data.user };
     } catch (e) {
       console.error('[auth] signin error:', e.message);
@@ -54,7 +54,7 @@ function setupIpcHandlers() {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      store.set('supabaseSession', null);
+      store.setSession(null);
       return { success: true };
     } catch (e) {
       console.error('[auth] signout error:', e.message);
@@ -195,6 +195,28 @@ function setupIpcHandlers() {
   });
 
   ipcMain.handle('settings:set', (event, key, val) => {
+    const ALLOWED_KEYS = [
+      'ollamaHost',
+      'selectedModel',
+      'searchDepth',
+      'temperature',
+      'systemPrompt',
+      'autoGenerateReport',
+      'reportFontSize',
+      'keepAlive',
+      'researchMode',
+      'enableMultiQuery',
+      'enableFollowups',
+      'enableSourceScoring',
+      'maxSubQueries',
+      'researchHistory',
+      'appTheme',
+      'contextLength'
+    ];
+    if (!ALLOWED_KEYS.includes(key)) {
+      console.warn(`[settings] Blocked unauthorized attempt to set key: ${key}`);
+      return false;
+    }
     store.set(key, val);
     return true;
   });
@@ -280,6 +302,10 @@ function setupIpcHandlers() {
         history = [];
       }
       history.push({ query, timestamp, reportMarkdown });
+      // Prune history to at most 50 entries to prevent unbounded configuration bloat
+      if (history.length > 50) {
+        history = history.slice(-50);
+      }
       store.set('researchHistory', history);
       return { success: true };
     } catch (e) {
