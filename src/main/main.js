@@ -81,22 +81,32 @@ function createWindow() {
 }
 
 async function handleDeepLink(urlString) {
-  if (!urlString || (!urlString.startsWith('knovant://') && !urlString.startsWith('galaxy://'))) return;
+  if (!urlString || (!urlString.includes('knovant://') && !urlString.includes('galaxy://'))) return;
   try {
-    console.log('[main] Deep link received:', urlString);
+    // Extract actual URL starting from knovant:// or galaxy:// to ignore any leading quotes or flags
+    let cleanUrl = urlString.replace(/^["']|["']$/g, '');
+    const protocolIndex = cleanUrl.indexOf('knovant://') !== -1 ? cleanUrl.indexOf('knovant://') : cleanUrl.indexOf('galaxy://');
+    if (protocolIndex !== -1) {
+      cleanUrl = cleanUrl.substring(protocolIndex);
+    }
+    
+    console.log('[main] Deep link received:', cleanUrl);
     
     // Extract access_token and refresh_token from hash or query parameters to be 100% robust
     let hash = '';
-    if (urlString.includes('#')) {
-      hash = urlString.substring(urlString.indexOf('#'));
-    } else if (urlString.includes('?')) {
-      hash = '#' + urlString.substring(urlString.indexOf('?') + 1);
+    if (cleanUrl.includes('#')) {
+      hash = cleanUrl.substring(cleanUrl.indexOf('#'));
+    } else if (cleanUrl.includes('?')) {
+      hash = '#' + cleanUrl.substring(cleanUrl.indexOf('?') + 1);
     }
     
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
-      const accessToken = params.get('access_token');
-      const refreshToken = params.get('refresh_token');
+      const rawAccessToken = params.get('access_token');
+      const rawRefreshToken = params.get('refresh_token');
+
+      const accessToken = rawAccessToken ? rawAccessToken.trim().replace(/["'\/]/g, '') : null;
+      const refreshToken = rawRefreshToken ? rawRefreshToken.trim().replace(/["'\/]/g, '') : null;
 
       if (accessToken && refreshToken) {
         const { data, error } = await supabase.auth.setSession({
