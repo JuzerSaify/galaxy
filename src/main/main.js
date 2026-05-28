@@ -1,9 +1,26 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const setupIpcHandlers = require('./ipc-handlers');
 const { autoUpdater } = require('electron-updater');
 const supabase = require('./supabase-client');
 const store = require('./store');
+
+// Advanced debug logger to inspect deep link arguments in Windows environment
+function logDebug(message) {
+  try {
+    const userDataPath = app.getPath('userData');
+    const logDir = path.join(userDataPath, 'logs');
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    const logFile = path.join(logDir, 'deeplink-debug.log');
+    const timestamp = new Date().toISOString();
+    fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`, 'utf8');
+  } catch (e) {
+    console.error('Failed to write debug log:', e.message);
+  }
+}
 
 // Global crash prevention — prevent unhandled errors from killing the app
 process.on('uncaughtException', (error) => {
@@ -32,12 +49,14 @@ if (!gotTheLock) {
   app.quit();
 } else {
   app.on('second-instance', (event, commandLine) => {
+    logDebug(`[second-instance] triggered. commandLine: ${JSON.stringify(commandLine)}`);
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
     }
     // Parse deep link parameters from second instance command line arguments
-    const deepLinkUrl = commandLine.find(arg => arg.includes('knovant://') || arg.includes('galaxy://'));
+    const deepLinkUrl = commandLine.find(arg => arg.includes('knovant://'));
+    logDebug(`[second-instance] Parsed deepLinkUrl: ${deepLinkUrl}`);
     if (deepLinkUrl) {
       handleDeepLink(deepLinkUrl);
     }
@@ -72,7 +91,9 @@ function createWindow() {
   });
 
   // Handle deep link on startup if the app was launched by clicking the protocol link
-  const startupUrl = process.argv.find(arg => arg.includes('knovant://') || arg.includes('galaxy://'));
+  const startupUrl = process.argv.find(arg => arg.includes('knovant://'));
+  logDebug(`[startup] process.argv: ${JSON.stringify(process.argv)}`);
+  logDebug(`[startup] Parsed startupUrl: ${startupUrl}`);
   if (startupUrl) {
     setTimeout(() => {
       handleDeepLink(startupUrl);
@@ -81,16 +102,24 @@ function createWindow() {
 }
 
 async function handleDeepLink(urlString) {
-  if (!urlString || (!urlString.includes('knovant://') && !urlString.includes('galaxy://'))) return;
+  logDebug(`[handleDeepLink] received raw: ${urlString}`);
+  if (!urlString || !urlString.includes('knovant://')) {
+    logDebug(`[handleDeepLink] invalid urlString, aborting`);
+    return;
+  }
   try {
-    // Extract actual URL starting from knovant:// or galaxy:// to ignore any leading quotes or flags
-    let cleanUrl = urlString.replace(/^["']|["']$/g, '');
-    const protocolIndex = cleanUrl.indexOf('knovant://') !== -1 ? cleanUrl.indexOf('knovant://') : cleanUrl.indexOf('galaxy://');
+    // 1. Trim and strip any wrapping quotes or trailing slashes from the end of the URL
+    let cleanUrl = urlString.trim().replace(/^["']|["']$/g, '');
+    if (cleanUrl.endsWith('/')) {
+      cleanUrl = cleanUrl.slice(0, -1);
+    }
+    
+    // 2. Substring starting from the protocol handler 'knovant://'
+    const protocolIndex = cleanUrl.indexOf('knovant://');
     if (protocolIndex !== -1) {
       cleanUrl = cleanUrl.substring(protocolIndex);
     }
-    
-    console.log('[main] Deep link received:', cleanUrl);
+    logDebug(`[handleDeepLink] cleaned URL: ${cleanUrl}`);
     
     // Extract access_token and refresh_token from hash or query parameters to be 100% robust
     let hash = '';
@@ -99,26 +128,34 @@ async function handleDeepLink(urlString) {
     } else if (cleanUrl.includes('?')) {
       hash = '#' + cleanUrl.substring(cleanUrl.indexOf('?') + 1);
     }
+    logDebug(`[handleDeepLink] extracted hash segment: ${hash}`);
     
     if (hash) {
       const params = new URLSearchParams(hash.substring(1));
       const rawAccessToken = params.get('access_token');
       const rawRefreshToken = params.get('refresh_token');
+      logDebug(`[handleDeepLink] rawAccessToken present: ${!!rawAccessToken}, rawRefreshToken present: ${!!rawRefreshToken}`);
 
-      const accessToken = rawAccessToken ? rawAccessToken.trim().replace(/["'\/]/g, '') : null;
-      const refreshToken = rawRefreshToken ? rawRefreshToken.trim().replace(/["'\/]/g, '') : null;
+      // DO NOT strip characters from the middle of the token to prevent corruption
+      // Only trim whitespace and any leading/trailing quotes if they somehow slipped in
+      const accessToken = rawAccessToken ? rawAccessToken.trim().replace(/^["']|["']$/g, '') : null;
+      const refreshToken = rawRefreshToken ? rawRefreshToken.trim().replace(/^["']|["']$/g, '') : null;
 
       if (accessToken && refreshToken) {
+        logDebug(`[handleDeepLink] Invoking supabase.auth.setSession...`);
         const { data, error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken
         });
 
-        if (error) throw error;
+        if (error) {
+          logDebug(`[handleDeepLink] supabase setSession failed: ${error.message}`);
+          throw error;
+        }
 
         // Persist session to store securely
         store.setSession(data.session);
-        console.log('[main] Supabase session set successfully via deep link for:', data.user.email);
+        logDebug(`[handleDeepLink] Supabase session set successfully for: ${data.user.email}`);
 
         // Notify UI
         if (mainWindow) {
@@ -126,10 +163,18 @@ async function handleDeepLink(urlString) {
             isAuthenticated: true,
             user: data.user
           });
+          logDebug(`[handleDeepLink] sent auth:status-changed to mainWindow`);
+        } else {
+          logDebug(`[handleDeepLink] WARNING: mainWindow was null when trying to send status change`);
         }
+      } else {
+        logDebug(`[handleDeepLink] missing accessToken or refreshToken after extraction`);
       }
+    } else {
+      logDebug(`[handleDeepLink] no hash or query segment found in URL`);
     }
   } catch (e) {
+    logDebug(`[handleDeepLink] EXCEPTION: ${e.message}`);
     console.error('[main] Deep link handling failed:', e.message);
   }
 }

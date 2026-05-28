@@ -29,8 +29,7 @@
       {
         "name": "Knovant Deep Link",
         "schemes": [
-          "knovant",
-          "galaxy"
+          "knovant"
         ]
       }
     ],
