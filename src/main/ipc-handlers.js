@@ -75,7 +75,7 @@ function setupIpcHandlers() {
   ipcMain.handle('auth:sign-in-google', async () => {
     try {
       // Open the Google Sign-in flow on the website landing page
-      const loginUrl = 'https://galaxy-website-ivory.vercel.app/?desktop=true';
+      const loginUrl = 'https://knovant.vercel.app/?desktop=true';
       await shell.openExternal(loginUrl);
       return { success: true };
     } catch (e) {
