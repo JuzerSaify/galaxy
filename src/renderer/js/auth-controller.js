@@ -48,6 +48,9 @@ class AuthController {
           this.showLoggedIn(status.user);
         } else {
           this.showLoggedOut();
+          if (status.error) {
+            alert('Authentication Failed: ' + status.error);
+          }
         }
       });
     }
@@ -226,6 +229,7 @@ class AuthController {
       clearTimeout(this.oauthTimeout);
       this.oauthTimeout = null;
     }
+    this.showLoading(false);
     if (this.loggedOutView && this.loggedInView) {
       this.loggedOutView.style.display = 'none';
       this.loggedInView.style.display = 'block';
@@ -247,6 +251,7 @@ class AuthController {
       clearTimeout(this.oauthTimeout);
       this.oauthTimeout = null;
     }
+    this.showLoading(false);
     if (this.loggedOutView && this.loggedInView) {
       this.loggedOutView.style.display = 'block';
       this.loggedInView.style.display = 'none';

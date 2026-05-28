@@ -169,13 +169,31 @@ async function handleDeepLink(urlString) {
         }
       } else {
         logDebug(`[handleDeepLink] missing accessToken or refreshToken after extraction`);
+        if (mainWindow) {
+          mainWindow.webContents.send('auth:status-changed', {
+            isAuthenticated: false,
+            error: 'Missing secure session tokens in redirect URL.'
+          });
+        }
       }
     } else {
       logDebug(`[handleDeepLink] no hash or query segment found in URL`);
+      if (mainWindow) {
+        mainWindow.webContents.send('auth:status-changed', {
+          isAuthenticated: false,
+          error: 'No session parameters found in protocol redirect.'
+        });
+      }
     }
   } catch (e) {
     logDebug(`[handleDeepLink] EXCEPTION: ${e.message}`);
     console.error('[main] Deep link handling failed:', e.message);
+    if (mainWindow) {
+      mainWindow.webContents.send('auth:status-changed', {
+        isAuthenticated: false,
+        error: e.message
+      });
+    }
   }
 }
 
